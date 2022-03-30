@@ -133,11 +133,31 @@ public class FhirResourceRepositoryImplTest
     public static class Patient extends AbstractBaseResource
     {
         private static final long serialVersionUID = -1428885428508171576L;
+
+        @Override
+        public Object getUserData(String s) {
+            return null;
+        }
+
+        @Override
+        public void setUserData(String s, Object o) {
+
+        }
     }
 
     public static class PlanDefinition extends AbstractBaseResource
     {
         private static final long serialVersionUID = -1428885428508171576L;
+
+        @Override
+        public Object getUserData(String s) {
+            return null;
+        }
+
+        @Override
+        public void setUserData(String s, Object o) {
+
+        }
     }
 
     public static abstract class AbstractBaseResource implements IBaseResource

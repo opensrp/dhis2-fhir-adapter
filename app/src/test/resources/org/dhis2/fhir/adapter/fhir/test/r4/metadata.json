@@ -6,13 +6,13 @@
   "kind": "instance",
   "software": {
     "name": "HAPI FHIR Server",
-    "version": "3.7.0"
+    "version": "5.7.0"
   },
   "implementation": {
     "description": "Example Server",
     "url": "http://localhost:8082/hapi-fhir-jpaserver-example-r4/baseR4"
   },
-  "fhirVersion": "4.0.0",
+  "fhirVersion": "5.7.0",
   "format": [
     "application/fhir+xml",
     "application/fhir+json"

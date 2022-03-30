@@ -67,12 +67,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
@@ -84,14 +83,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -131,7 +123,7 @@ public class TrackedEntityServiceImpl implements TrackedEntityService, LocalDhis
 
     protected static final int MAX_RESERVE_RETRIES = 10;
 
-    private final RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
     private final TrackedEntityMetadataService metadataService;
 
@@ -142,6 +134,12 @@ public class TrackedEntityServiceImpl implements TrackedEntityService, LocalDhis
     private final ZoneId zoneId = ZoneId.systemDefault();
 
     private final LocalDhisResourceRepositoryTemplate<TrackedEntityInstance> resourceRepositoryTemplate;
+
+    @Value( "${dhis2.fhir-adapter.endpoint.url}" )
+    protected String dhis2BaseUrl;
+
+    @Value( "${dhis2.fhir-adapter.endpoint.api-version}" )
+    protected String dhis2ApiVersion;
 
     @Autowired
     public TrackedEntityServiceImpl( @Nonnull @Qualifier( "userDhis2RestTemplate" ) RestTemplate restTemplate, @Nonnull RequestCacheService requestCacheService,
@@ -480,7 +478,22 @@ public class TrackedEntityServiceImpl implements TrackedEntityService, LocalDhis
         try
         {
             clear( trackedEntityInstance );
-            response = restTemplate.exchange( CREATE_URI, HttpMethod.POST, new HttpEntity<>( trackedEntityInstance ), ImportSummariesWebMessage.class );
+//
+//            MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
+//            mappingJackson2HttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_HTML));
+//            restTemplate.getMessageConverters().add(mappingJackson2HttpMessageConverter);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+//            headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+            HttpEntity<TrackedEntityInstance> entity = new HttpEntity<>(trackedEntityInstance, headers);
+//
+//            restTemplate = new RestTemplate();
+//            MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
+//            mappingJackson2HttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_HTML, MediaType.ALL,MediaType.APPLICATION_JSON, MediaType.APPLICATION_OCTET_STREAM));
+//            restTemplate.getMessageConverters().add(mappingJackson2HttpMessageConverter);
+//            response = restTemplate.exchange(dhis2BaseUrl + "api/" + dhis2ApiVersion + CREATE_URI, HttpMethod.POST, entity , ImportSummariesWebMessage.class );
+            response = restTemplate.exchange("https://play.dhis2.org/2.37.3/api/30/trackedEntityInstances.json?strategy=CREATE", HttpMethod.POST, entity , ImportSummariesWebMessage.class );
+
         }
         catch ( HttpClientErrorException e )
         {

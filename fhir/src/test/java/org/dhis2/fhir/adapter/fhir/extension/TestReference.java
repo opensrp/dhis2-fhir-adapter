@@ -52,9 +52,8 @@ public class TestReference implements IBaseReference
     }
 
     @Override
-    public void setResource( IBaseResource theResource )
-    {
-
+    public IBaseReference setResource(IBaseResource iBaseResource) {
+        return null;
     }
 
     @Override
@@ -82,6 +81,11 @@ public class TestReference implements IBaseReference
     }
 
     @Override
+    public boolean hasIdentifier() {
+        return IBaseReference.super.hasIdentifier();
+    }
+
+    @Override
     public boolean isEmpty()
     {
         return false;
@@ -103,5 +107,20 @@ public class TestReference implements IBaseReference
     public List<String> getFormatCommentsPost()
     {
         return null;
+    }
+
+    @Override
+    public String fhirType() {
+        return IBaseReference.super.fhirType();
+    }
+
+    @Override
+    public Object getUserData(String s) {
+        return null;
+    }
+
+    @Override
+    public void setUserData(String s, Object o) {
+
     }
 }
