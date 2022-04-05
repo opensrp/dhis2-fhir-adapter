@@ -28,6 +28,8 @@ package org.dhis2.fhir.adapter.dhis.tracker.trackedentity.impl;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.apache.commons.lang.StringUtils;
 import org.dhis2.fhir.adapter.auth.UnauthorizedException;
@@ -68,9 +70,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.*;
+import org.springframework.http.client.support.BasicAuthorizationInterceptor;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -81,6 +86,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;
@@ -123,7 +130,7 @@ public class TrackedEntityServiceImpl implements TrackedEntityService, LocalDhis
 
     protected static final int MAX_RESERVE_RETRIES = 10;
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     private final TrackedEntityMetadataService metadataService;
 
@@ -256,8 +263,11 @@ public class TrackedEntityServiceImpl implements TrackedEntityService, LocalDhis
             return Collections.emptyList();
         }
 
-        return Objects.requireNonNull( restTemplate.getForEntity( FIND_BY_ATTR_VALUE_URI, TrackedEntityInstances.class, typeId, attributeId, value, maxResult )
-            .getBody() ).getTrackedEntityInstances();
+//        return Objects.requireNonNull( restTemplate.getForEntity( "https://play.dhis2.org/2.37.3/api/30/trackedEntityInstances.json?trackedEntityType=nEenWmSyUEp&ouMode=ACCESSIBLE&filter=AuPLng5hLbE:EQ:1383891882&pageSize=2&fields=deleted,trackedEntityInstance,trackedEntityType,orgUnit,coordinates,lastUpdated,attributes[attribute,value,lastUpdated,storedBy]", TrackedEntityInstances.class)
+//            .getBody() ).getTrackedEntityInstances();
+
+        return Objects.requireNonNull( restTemplate.getForEntity( "https://play.dhis2.org/2.37.3/api/30/trackedEntityInstances.json?trackedEntityType=nEenWmSyUEp&ouMode=ACCESSIBLE&filter=AuPLng5hLbE:EQ:1383891882&pageSize=2&fields=deleted,trackedEntityInstance,trackedEntityType,orgUnit,coordinates,lastUpdated,attributes[attribute,value,lastUpdated,storedBy]", TrackedEntityInstances.class)
+                .getBody() ).getTrackedEntityInstances();
     }
 
     @HystrixCommand( ignoreExceptions = UnauthorizedException.class )
@@ -518,6 +528,18 @@ public class TrackedEntityServiceImpl implements TrackedEntityService, LocalDhis
 
         storeItem( syncGroup, trackedEntityInstance.getId(), response );
         return trackedEntityInstance;
+    }
+
+    private HttpHeaders createHeaders(String username, String password){
+        return new HttpHeaders() {{
+            String auth = username + ":" + password;
+            byte[] encodedAuth = org.apache.commons.codec.binary.Base64.encodeBase64(
+                    auth.getBytes(Charset.forName("US-ASCII")) );
+            String authHeader = "Basic " + new String( encodedAuth );
+            set( "Authorization", authHeader );
+            set( "Content-Type", "application/json" );
+            set( "Accept", "/" );
+        }};
     }
 
     @Nonnull
