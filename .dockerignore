@@ -1,0 +1,13 @@
+/docs/
+Dockerfile
+*.md
+.git
+/app/target/
+/common/target/
+/dhis/target/
+/fhir/target/
+/fhir-dstu3/target/
+/fhir-r4/target/
+/metadata-sheet/target/
+/summary/target/
+/.idea/
