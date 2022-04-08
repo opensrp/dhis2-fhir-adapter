@@ -11,7 +11,7 @@ RUN mvn clean package -DskipTests
 RUN mkdir -p ${DHIS2_HOME}/services/fhir-adapter \
     && cp /tmp/dhis2-fhir-adapter/app/target/dhis2-fhir-adapter.war ${DHIS2_HOME}/main.war
 
-FROM openjdk:8-jdk-slim AS deploy
+FROM openjdk:8-jre-slim AS deploy
 
 # specify the DHIS2_HOME environment variable
 ENV DHIS2_HOME=/app
