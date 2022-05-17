@@ -142,14 +142,14 @@ public class TrackedEntityServiceImpl implements TrackedEntityService, LocalDhis
 
     private final LocalDhisResourceRepositoryTemplate<TrackedEntityInstance> resourceRepositoryTemplate;
 
-    @Value( "${dhis2.fhir-adapter.endpoint.url}" )
-    protected String dhis2BaseUrl;
-
-    @Value( "${dhis2.fhir-adapter.endpoint.api-version}" )
-    protected String dhis2ApiVersion;
+//    @Value( "${dhis2.fhir-adapter.endpoint.url}" )
+//    protected String dhis2BaseUrl;
+//
+//    @Value( "${dhis2.fhir-adapter.endpoint.api-version}" )
+//    protected String dhis2ApiVersion;
 
     @Autowired
-    public TrackedEntityServiceImpl( @Nonnull @Qualifier( "userDhis2RestTemplate" ) RestTemplate restTemplate, @Nonnull RequestCacheService requestCacheService,
+    public TrackedEntityServiceImpl( @Nonnull @Qualifier( "systemDhis2RestTemplate" ) RestTemplate restTemplate, @Nonnull RequestCacheService requestCacheService,
         @Nonnull TrackedEntityMetadataService metadataService, @Nonnull StoredDhisResourceService storedItemService )
     {
         this.restTemplate = restTemplate;
@@ -263,11 +263,16 @@ public class TrackedEntityServiceImpl implements TrackedEntityService, LocalDhis
             return Collections.emptyList();
         }
 
-//        return Objects.requireNonNull( restTemplate.getForEntity( "https://play.dhis2.org/2.37.3/api/30/trackedEntityInstances.json?trackedEntityType=nEenWmSyUEp&ouMode=ACCESSIBLE&filter=AuPLng5hLbE:EQ:1383891882&pageSize=2&fields=deleted,trackedEntityInstance,trackedEntityType,orgUnit,coordinates,lastUpdated,attributes[attribute,value,lastUpdated,storedBy]", TrackedEntityInstances.class)
-//            .getBody() ).getTrackedEntityInstances();
+        try {
 
-        return Objects.requireNonNull( restTemplate.getForEntity( "https://play.dhis2.org/2.37.3/api/30/trackedEntityInstances.json?trackedEntityType=nEenWmSyUEp&ouMode=ACCESSIBLE&filter=AuPLng5hLbE:EQ:1383891882&pageSize=2&fields=deleted,trackedEntityInstance,trackedEntityType,orgUnit,coordinates,lastUpdated,attributes[attribute,value,lastUpdated,storedBy]", TrackedEntityInstances.class)
-                .getBody() ).getTrackedEntityInstances();
+            return Objects.requireNonNull( restTemplate.getForEntity( FIND_BY_ATTR_VALUE_URI, TrackedEntityInstances.class, typeId, attributeId, value, maxResult )
+                    .getBody() ).getTrackedEntityInstances();
+        }
+        catch (org.springframework.web.client.HttpClientErrorException e) {
+
+           logger.error(e.getMessage(), e.getRawStatusCode());
+        }
+        return Collections.emptyList();
     }
 
     @HystrixCommand( ignoreExceptions = UnauthorizedException.class )
@@ -488,22 +493,7 @@ public class TrackedEntityServiceImpl implements TrackedEntityService, LocalDhis
         try
         {
             clear( trackedEntityInstance );
-//
-//            MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
-//            mappingJackson2HttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_HTML));
-//            restTemplate.getMessageConverters().add(mappingJackson2HttpMessageConverter);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-//            headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
-            HttpEntity<TrackedEntityInstance> entity = new HttpEntity<>(trackedEntityInstance, headers);
-//
-//            restTemplate = new RestTemplate();
-//            MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
-//            mappingJackson2HttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_HTML, MediaType.ALL,MediaType.APPLICATION_JSON, MediaType.APPLICATION_OCTET_STREAM));
-//            restTemplate.getMessageConverters().add(mappingJackson2HttpMessageConverter);
-//            response = restTemplate.exchange(dhis2BaseUrl + "api/" + dhis2ApiVersion + CREATE_URI, HttpMethod.POST, entity , ImportSummariesWebMessage.class );
-            response = restTemplate.exchange("https://play.dhis2.org/2.37.3/api/30/trackedEntityInstances.json?strategy=CREATE", HttpMethod.POST, entity , ImportSummariesWebMessage.class );
-
+            response = restTemplate.exchange( CREATE_URI, HttpMethod.POST, new HttpEntity<>(trackedEntityInstance), ImportSummariesWebMessage.class );
         }
         catch ( HttpClientErrorException e )
         {

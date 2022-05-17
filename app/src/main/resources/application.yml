@@ -49,3 +49,4 @@ spring:
 
 logging:
   file: ${dhis2.home}/services/fhir-adapter/logs/dhis2-fhir-adapter.log
+logging.level.org.springframework.web: DEBUG

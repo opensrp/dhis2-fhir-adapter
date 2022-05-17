@@ -182,7 +182,7 @@ public class DhisConfig
     public GenericJackson2JsonRedisSerializer cacheRedisSerializer()
     {
         final ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
+//        mapper.registerModule(new JavaTimeModule());
         mapper.enableDefaultTyping( ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY );
         mapper.setFilterProvider( new SimpleFilterProvider()
             .addFilter( AdapterBeanPropertyFilter.FILTER_NAME, new JsonCachePropertyFilter() )

@@ -144,7 +144,7 @@ dhis2.fhir-adapter:
   endpoint:
     # The base URL of the DHIS2 installation.
     # url: https://cfc-dhis2.labs.smartregister.org/
-    url: https://play.dhis2.org/2.37.3/
+    url: https://play.dhis2.org/2.37.6/
     # The API version that should be accessed on the DHIS2 installation.
     api-version: 30
     # Authentication data to access metadata on DHIS2 installation.

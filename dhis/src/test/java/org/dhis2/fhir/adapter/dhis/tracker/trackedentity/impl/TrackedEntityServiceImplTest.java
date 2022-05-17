@@ -124,7 +124,8 @@ public class TrackedEntityServiceImplTest
     @Test
     public void find() throws IOException
     {
-        mockServer.expect( requestTo( "https://play.dhis2.org/2.37.3/api/30/trackedEntityInstances.json?trackedEntityType=nEenWmSyUEp&ouMode=ACCESSIBLE&filter=AuPLng5hLbE:EQ:1383891882&pageSize=2&fields=deleted,trackedEntityInstance,trackedEntityType,orgUnit,coordinates,lastUpdated,attributes%5Battribute,value,lastUpdated,storedBy%5D" ) )
+        mockServer.expect( requestTo( "http://localhost:8080/api/trackedEntityInstances.json?trackedEntityType=ur1Edk5Oe2n&ouMode=ACCESSIBLE&filter=tPeQKGUIowE:EQ:PT_72983&pageSize=2&fields=deleted,trackedEntityInstance,trackedEntityType,orgUnit," +
+            "coordinates,lastUpdated,attributes%5Battribute,value,lastUpdated,storedBy%5D" ) )
             .andExpect( method( HttpMethod.GET ) ).andRespond( withSuccess( IOUtils.resourceToByteArray( "/org/dhis2/fhir/adapter/dhis/tracker/program/impl/trackedEntityInstances.json" ), MediaType.APPLICATION_JSON ) );
 
         Collection<TrackedEntityInstance> trackedEntityInstances = service.findByAttrValue( "ur1Edk5Oe2n", "tPeQKGUIowE", "PT_72983", 2 );
@@ -134,7 +135,8 @@ public class TrackedEntityServiceImplTest
     @Test
     public void findLocal() throws IOException
     {
-        mockServer.expect( requestTo( "https://play.dhis2.org/2.37.3/api/30/trackedEntityInstances.json?trackedEntityType=nEenWmSyUEp&ouMode=ACCESSIBLE&filter=AuPLng5hLbE:EQ:1383891882&pageSize=2&fields=deleted,trackedEntityInstance,trackedEntityType,orgUnit,coordinates,lastUpdated,attributes%5Battribute,value,lastUpdated,storedBy%5D" ) )
+        mockServer.expect( requestTo( "http://localhost:8080/api/trackedEntityInstances.json?trackedEntityType=ur1Edk5Oe2n&ouMode=ACCESSIBLE&filter=tPeQKGUIowE:EQ:PT_72983&pageSize=2&fields=deleted,trackedEntityInstance,trackedEntityType,orgUnit," +
+            "coordinates,lastUpdated,attributes%5Battribute,value,lastUpdated,storedBy%5D" ) )
             .andExpect( method( HttpMethod.GET ) ).andRespond( withSuccess( IOUtils.resourceToByteArray( "/org/dhis2/fhir/adapter/dhis/tracker/program/impl/trackedEntityInstances.json" ), MediaType.APPLICATION_JSON ) );
 
         try ( final RequestCacheContext cacheContext = requestCacheService.createRequestCacheContext() )
@@ -217,7 +219,7 @@ public class TrackedEntityServiceImplTest
     @Test
     public void create() throws IOException
     {
-        mockServer.expect( ExpectedCount.once(), requestTo( "https://play.dhis2.org/2.37.3/api/30/trackedEntityInstances.json?strategy=CREATE" ) )
+        mockServer.expect( ExpectedCount.once(), requestTo( "http://localhost:8080/api/trackedEntityInstances.json?strategy=CREATE" ) )
             .andExpect( content().contentTypeCompatibleWith( MediaType.APPLICATION_JSON ) )
             .andExpect( content().json( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/dhis/tracker/program/impl/createTrackedEntityInstance.json", StandardCharsets.UTF_8 ) ) )
             .andExpect( method( HttpMethod.POST ) ).andRespond( withSuccess( IOUtils.resourceToByteArray( "/org/dhis2/fhir/adapter/dhis/tracker/program/impl/createTrackedEntityInstance-response.json" ), MediaType.APPLICATION_JSON ) );

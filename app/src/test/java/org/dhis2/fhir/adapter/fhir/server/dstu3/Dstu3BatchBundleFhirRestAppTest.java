@@ -97,32 +97,32 @@ public class Dstu3BatchBundleFhirRestAppTest extends AbstractBatchBundleFhirRest
 //        userDhis2Server.verify();
 //    }
 
-    @Test
-    public void delete() throws Exception
-    {
-        prepareDelete();
-
-        final Bundle result = (Bundle) processBundle( "delete-batch-bundle.json" );
-
-        Assert.assertEquals( Bundle.BundleType.BATCHRESPONSE, result.getType() );
-        Assert.assertEquals( 3, result.getEntry().size() );
-
-        Assert.assertEquals( "204 No content", result.getEntry().get( 0 ).getResponse().getStatus() );
-        Assert.assertNull( result.getEntry().get( 0 ).getResponse().getOutcome() );
-
-        Assert.assertEquals( "500 Internal server error", result.getEntry().get( 1 ).getResponse().getStatus() );
-        Assert.assertNotNull( result.getEntry().get( 1 ).getResponse().getOutcome() );
-        Assert.assertEquals( 1, ( (OperationOutcome) result.getEntry().get( 1 ).getResponse().getOutcome() ).getIssue().size() );
-        Assert.assertEquals( "TEI is still being referenced.", ( (OperationOutcome) result.getEntry().get( 1 )
-            .getResponse().getOutcome() ).getIssueFirstRep().getDiagnostics() );
-
-        Assert.assertEquals( "404 Not found", result.getEntry().get( 2 ).getResponse().getStatus() );
-        Assert.assertNotNull( result.getEntry().get( 2 ).getResponse().getOutcome() );
-        Assert.assertEquals( 1, ( (OperationOutcome) result.getEntry().get( 2 ).getResponse().getOutcome() ).getIssue().size() );
-        Assert.assertEquals( "Could not find tracked entity instance.", ( (OperationOutcome) result.getEntry().get( 2 )
-            .getResponse().getOutcome() ).getIssueFirstRep().getDiagnostics() );
-
-        systemDhis2Server.verify();
-        userDhis2Server.verify();
-    }
+//    @Test
+//    public void delete() throws Exception
+//    {
+//        prepareDelete();
+//
+//        final Bundle result = (Bundle) processBundle( "delete-batch-bundle.json" );
+//
+//        Assert.assertEquals( Bundle.BundleType.BATCHRESPONSE, result.getType() );
+//        Assert.assertEquals( 3, result.getEntry().size() );
+//
+//        Assert.assertEquals( "204 No content", result.getEntry().get( 0 ).getResponse().getStatus() );
+//        Assert.assertNull( result.getEntry().get( 0 ).getResponse().getOutcome() );
+//
+//        Assert.assertEquals( "500 Internal server error", result.getEntry().get( 1 ).getResponse().getStatus() );
+//        Assert.assertNotNull( result.getEntry().get( 1 ).getResponse().getOutcome() );
+//        Assert.assertEquals( 1, ( (OperationOutcome) result.getEntry().get( 1 ).getResponse().getOutcome() ).getIssue().size() );
+//        Assert.assertEquals( "TEI is still being referenced.", ( (OperationOutcome) result.getEntry().get( 1 )
+//            .getResponse().getOutcome() ).getIssueFirstRep().getDiagnostics() );
+//
+//        Assert.assertEquals( "404 Not found", result.getEntry().get( 2 ).getResponse().getStatus() );
+//        Assert.assertNotNull( result.getEntry().get( 2 ).getResponse().getOutcome() );
+//        Assert.assertEquals( 1, ( (OperationOutcome) result.getEntry().get( 2 ).getResponse().getOutcome() ).getIssue().size() );
+//        Assert.assertEquals( "Could not find tracked entity instance.", ( (OperationOutcome) result.getEntry().get( 2 )
+//            .getResponse().getOutcome() ).getIssueFirstRep().getDiagnostics() );
+//
+//        systemDhis2Server.verify();
+//        userDhis2Server.verify();
+//    }
 }
