@@ -29,11 +29,13 @@ package org.dhis2.fhir.adapter.fhir.server.provider;
  */
 
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.IPagingProvider;
 import org.dhis2.fhir.adapter.fhir.transform.config.FhirRestInterfaceConfig;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * A paging provider that do not support paging.
@@ -63,6 +65,15 @@ public class NonPagingProvider implements IPagingProvider
     }
 
     @Override
+    public boolean canStoreSearchResults() {
+        return IPagingProvider.super.canStoreSearchResults();
+    }
+
+    @Override
+    public IBundleProvider retrieveResultList(@Nullable RequestDetails requestDetails, @Nonnull String s) {
+        return null;
+    }
+
     public IBundleProvider retrieveResultList( String theSearchId )
     {
         // retrieving result list is not supported
@@ -70,9 +81,14 @@ public class NonPagingProvider implements IPagingProvider
     }
 
     @Override
-    public String storeResultList( IBundleProvider theList )
-    {
+    public IBundleProvider retrieveResultList(@Nullable RequestDetails theRequestDetails, @Nonnull String theSearchId, String thePageId) {
+        return IPagingProvider.super.retrieveResultList(theRequestDetails, theSearchId, thePageId);
+    }
+
+    @Override
+    public String storeResultList(@Nullable RequestDetails requestDetails, IBundleProvider iBundleProvider) {
         // storing result list is not supported
         return null;
     }
+
 }

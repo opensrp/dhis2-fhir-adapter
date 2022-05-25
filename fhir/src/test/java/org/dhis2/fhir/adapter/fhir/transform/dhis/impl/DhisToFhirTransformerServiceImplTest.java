@@ -242,6 +242,16 @@ public class DhisToFhirTransformerServiceImplTest
         {
             return null;
         }
+
+        @Override
+        public Object getUserData(String s) {
+            return null;
+        }
+
+        @Override
+        public void setUserData(String s, Object o) {
+
+        }
     }
 
     public static class TestReference implements IBaseReference
@@ -262,8 +272,9 @@ public class DhisToFhirTransformerServiceImplTest
         }
 
         @Override
-        public void setResource( IBaseResource theResource )
+        public IBaseReference setResource( IBaseResource theResource )
         {
+            return null;
             // nothing to be done
         }
 
@@ -314,6 +325,16 @@ public class DhisToFhirTransformerServiceImplTest
         public List<String> getFormatCommentsPost()
         {
             return null;
+        }
+
+        @Override
+        public Object getUserData(String s) {
+            return null;
+        }
+
+        @Override
+        public void setUserData(String s, Object o) {
+
         }
 
         @Override

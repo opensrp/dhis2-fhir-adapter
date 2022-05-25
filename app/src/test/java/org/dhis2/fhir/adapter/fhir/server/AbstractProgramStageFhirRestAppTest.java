@@ -30,6 +30,9 @@ package org.dhis2.fhir.adapter.fhir.server;
 
 import org.apache.commons.io.IOUtils;
 import org.dhis2.fhir.adapter.AbstractAppTest;
+import org.dhis2.fhir.adapter.fhir.model.FhirVersion;
+import org.jetbrains.annotations.NotNull;
+import org.junit.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.ExpectedCount;
@@ -44,9 +47,10 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  *
  * @author volsch
  */
-public abstract class AbstractProgramStageFhirRestAppTest extends AbstractAppTest
+public class AbstractProgramStageFhirRestAppTest extends AbstractAppTest
 {
-    protected void expectProgramStageMetadataRequests() throws Exception
+    @Test
+    public void expectProgramStageMetadataRequests() throws Exception
     {
         systemDhis2Server.expect( ExpectedCount.between( 0, 1 ), method( HttpMethod.GET ) ).andExpect( header( "Authorization", testConfiguration.getDhis2SystemAuthorization() ) )
             .andExpect( requestTo( dhis2BaseUrl + "/api/" + dhis2ApiVersion + "/trackedEntityAttributes.json?paging=false&fields=id,name,code,valueType,generated,optionSetValue,optionSet%5Bid,name,options%5Bcode,name%5D%5D" ) )
@@ -83,5 +87,11 @@ public abstract class AbstractProgramStageFhirRestAppTest extends AbstractAppTes
                 "programStageDataElements%5Bid,compulsory,allowProvidedElsewhere,dataElement%5Bid,name,code,formName,valueType,optionSetValue,optionSet%5Bid,name,options%5Bcode,name%5D%5D%5D%5D" ) )
             .andRespond( withSuccess( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/dhis/test/single-program-stage.json", StandardCharsets.UTF_8 ), MediaType.APPLICATION_JSON ) );
 
+    }
+
+    @NotNull
+    @Override
+    protected FhirVersion getFhirVersion() {
+        return FhirVersion.R4;
     }
 }

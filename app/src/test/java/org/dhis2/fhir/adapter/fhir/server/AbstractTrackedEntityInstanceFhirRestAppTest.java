@@ -30,6 +30,9 @@ package org.dhis2.fhir.adapter.fhir.server;
 
 import org.apache.commons.io.IOUtils;
 import org.dhis2.fhir.adapter.AbstractAppTest;
+import org.dhis2.fhir.adapter.fhir.model.FhirVersion;
+import org.jetbrains.annotations.NotNull;
+import org.junit.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.ExpectedCount;
@@ -44,9 +47,10 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  *
  * @author volsch
  */
-public abstract class AbstractTrackedEntityInstanceFhirRestAppTest extends AbstractAppTest
+public class AbstractTrackedEntityInstanceFhirRestAppTest extends AbstractAppTest
 {
-    protected void expectTrackedEntityMetadataRequests() throws Exception
+    @Test
+    public void expectTrackedEntityMetadataRequests() throws Exception
     {
         systemDhis2Server.expect( ExpectedCount.between( 0, 1 ), method( HttpMethod.GET ) ).andExpect( header( "Authorization", testConfiguration.getDhis2SystemAuthorization() ) )
             .andExpect( requestTo( dhis2BaseUrl + "/api/" + dhis2ApiVersion + "/trackedEntityAttributes.json?paging=false&fields=id,name,code,valueType,generated,optionSetValue,optionSet%5Bid,name,options%5Bcode,name%5D%5D" ) )
@@ -62,5 +66,11 @@ public abstract class AbstractTrackedEntityInstanceFhirRestAppTest extends Abstr
         systemDhis2Server.expect( ExpectedCount.between( 0, 1 ), method( HttpMethod.GET ) ).andExpect( header( "Authorization", testConfiguration.getDhis2SystemAuthorization() ) )
             .andExpect( requestTo( dhis2BaseUrl + "/api/" + dhis2ApiVersion + "/organisationUnits/ldXIdLNUNEn.json?fields=lastUpdated,id,code,name,shortName,displayName,level,openingDate,closedDate,coordinates,leaf,parent%5Bid%5D" ) )
             .andRespond( withSuccess( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/dhis/test/single-org-unit-OU_1234.json", StandardCharsets.UTF_8 ), MediaType.APPLICATION_JSON ) );
+    }
+
+    @NotNull
+    @Override
+    protected FhirVersion getFhirVersion() {
+        return FhirVersion.R4;
     }
 }

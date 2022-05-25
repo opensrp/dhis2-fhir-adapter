@@ -242,5 +242,35 @@ public class AbstractProgramMetadataToFhirPlanDefinitionTransformerTest
         {
             return !extensions.isEmpty();
         }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public boolean hasFormatComment() {
+            return false;
+        }
+
+        @Override
+        public List<String> getFormatCommentsPre() {
+            return null;
+        }
+
+        @Override
+        public List<String> getFormatCommentsPost() {
+            return null;
+        }
+
+        @Override
+        public Object getUserData(String s) {
+            return null;
+        }
+
+        @Override
+        public void setUserData(String s, Object o) {
+
+        }
     }
 }

@@ -29,6 +29,8 @@ package org.dhis2.fhir.adapter.fhir.server;
  */
 
 import org.dhis2.fhir.adapter.AbstractAppTest;
+import org.dhis2.fhir.adapter.fhir.model.FhirVersion;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
@@ -41,7 +43,7 @@ import org.springframework.http.ResponseEntity;
  *
  * @author volsch
  */
-public abstract class AbstractFhirServerAppTest extends AbstractAppTest
+public class AbstractFhirServerAppTest extends AbstractAppTest
 {
     @Test
     public void corsAvailable()
@@ -53,5 +55,11 @@ public abstract class AbstractFhirServerAppTest extends AbstractAppTest
             "http://localhost:" + localPort + "/fhir/" + getFhirVersionPath() + "/default/metadata", HttpMethod.GET, entity, String.class );
         Assert.assertEquals( 200, responseEntity.getStatusCodeValue() );
         Assert.assertEquals( "localhost", responseEntity.getHeaders().getFirst( "Access-Control-Allow-Origin" ) );
+    }
+
+    @NotNull
+    @Override
+    protected FhirVersion getFhirVersion() {
+        return FhirVersion.R4;
     }
 }

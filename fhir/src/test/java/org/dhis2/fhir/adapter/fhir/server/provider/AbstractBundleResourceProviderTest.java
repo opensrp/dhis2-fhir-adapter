@@ -671,6 +671,16 @@ public class AbstractBundleResourceProviderTest
         {
             return null;
         }
+
+        @Override
+        public Object getUserData(String s) {
+            return null;
+        }
+
+        @Override
+        public void setUserData(String s, Object o) {
+
+        }
     }
 
     public static class MeasureReport implements IBaseResource
@@ -729,6 +739,16 @@ public class AbstractBundleResourceProviderTest
         public List<String> getFormatCommentsPost()
         {
             return null;
+        }
+
+        @Override
+        public Object getUserData(String s) {
+            return null;
+        }
+
+        @Override
+        public void setUserData(String s, Object o) {
+
         }
     }
 }
