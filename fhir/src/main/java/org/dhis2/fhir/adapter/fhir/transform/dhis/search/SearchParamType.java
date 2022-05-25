@@ -42,67 +42,75 @@ import java.util.regex.Pattern;
  *
  * @author volsch
  */
-public enum SearchParamType {
-    NUMBER(false, true) {
-        private final Pattern NUMBER_PATTERN = Pattern.compile("\\d+(\\.\\d+)([eE]\\d{1,2})?");
+public enum SearchParamType
+{
+    NUMBER( false, true )
+        {
+            private final Pattern NUMBER_PATTERN = Pattern.compile( "\\d+(\\.\\d+)([eE]\\d{1,2})?" );
 
-        @Nullable
-        @Override
-        public String convertToDhis(@Nullable String value) throws DhisToFhirDataProviderException {
-            if ((value != null) && !NUMBER_PATTERN.matcher(value).matches()) {
-                throw new DhisToFhirDataProviderException("Search parameter value is not a number: " + value);
+            @Nullable
+            @Override
+            public String convertToDhis( @Nullable String value ) throws DhisToFhirDataProviderException
+            {
+                if ( ( value != null ) && !NUMBER_PATTERN.matcher( value ).matches() )
+                {
+                    throw new DhisToFhirDataProviderException( "Search parameter value is not a number: " + value );
+                }
+                return value;
             }
-            return value;
-        }
-    },
-    DATE(false, true) {
-        private final DateToIsoDateStringConverter converter = new DateToIsoDateStringConverter();
+        },
+    DATE( false, true )
+        {
+            private final DateToIsoDateStringConverter converter = new DateToIsoDateStringConverter();
 
-        @Nullable
-        @Override
-        public String convertToDhis(@Nullable String value) throws DhisToFhirDataProviderException {
-            if (value == null) {
-                return null;
+            @Nullable
+            @Override
+            public String convertToDhis( @Nullable String value ) throws DhisToFhirDataProviderException
+            {
+                if ( value == null )
+                {
+                    return null;
+                }
+                try
+                {
+                    final DateTimeDt dateTimeDt = new DateTimeDt();
+                    dateTimeDt.setPrecision( TemporalPrecisionEnum.MILLI );
+                    dateTimeDt.setValueAsString( value );
+                    return converter.doConvert( dateTimeDt.getValue() );
+                }
+                catch ( DataFormatException e )
+                {
+                    throw new DhisToFhirDataProviderException( "Search parameter is not a valid date: " + value );
+                }
             }
-            try {
-                final DateTimeDt dateTimeDt = new DateTimeDt();
-                dateTimeDt.setPrecision(TemporalPrecisionEnum.MILLI);
-                dateTimeDt.setValueAsString(value);
-                return converter.doConvert(dateTimeDt.getValue());
-            } catch (DataFormatException e) {
-                throw new DhisToFhirDataProviderException("Search parameter is not a valid date: " + value);
+        },
+    STRING( true, false )
+        {
+            @Nullable
+            @Override
+            public String convertToDhis( @Nullable String value ) throws DhisToFhirDataProviderException
+            {
+                return value;
             }
-        }
-    },
-    STRING(true, false) {
-        @Nullable
-        @Override
-        public String convertToDhis(@Nullable String value) throws DhisToFhirDataProviderException {
-            return value;
-        }
-    },
-    REFERENCE(false, false) {
-        @Nullable
-        @Override
-        public String convertToDhis(@Nullable String value) throws DhisToFhirDataProviderException {
-            throw new IllegalStateException("Reference values cannot be converted to DHIS");
-        }
-    },
-    TOKEN(true, false) {
-        @Nullable
-        @Override
-        public String convertToDhis(@Nullable String value) throws DhisToFhirDataProviderException {
-            return value;
-        }
-    },
-
-    SPECIAL(true, false) {
-        @Nullable
-        @Override
-        public String convertToDhis(@Nullable String value) throws DhisToFhirDataProviderException {
-            return value;
-        }
-    };
+        },
+    REFERENCE( false, false )
+        {
+            @Nullable
+            @Override
+            public String convertToDhis( @Nullable String value ) throws DhisToFhirDataProviderException
+            {
+                throw new IllegalStateException( "Reference values cannot be converted to DHIS" );
+            }
+        },
+    TOKEN( true, false )
+        {
+            @Nullable
+            @Override
+            public String convertToDhis( @Nullable String value ) throws DhisToFhirDataProviderException
+            {
+                return value;
+            }
+        };
 
     private final boolean modifierAllowed;
 

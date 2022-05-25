@@ -74,6 +74,12 @@ public class NonPagingProvider implements IPagingProvider
         return null;
     }
 
+    public IBundleProvider retrieveResultList( String theSearchId )
+    {
+        // retrieving result list is not supported
+        return null;
+    }
+
     @Override
     public IBundleProvider retrieveResultList(@Nullable RequestDetails theRequestDetails, @Nonnull String theSearchId, String thePageId) {
         return IPagingProvider.super.retrieveResultList(theRequestDetails, theSearchId, thePageId);
@@ -81,6 +87,7 @@ public class NonPagingProvider implements IPagingProvider
 
     @Override
     public String storeResultList(@Nullable RequestDetails requestDetails, IBundleProvider iBundleProvider) {
+        // storing result list is not supported
         return null;
     }
 

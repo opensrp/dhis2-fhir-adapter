@@ -163,42 +163,42 @@ public abstract class AbstractPatientToTrackedEntityInstanceTransformationAppTes
         systemDhis2Server.verify();
     }
 
-    @Test
-    public void updatePersonWithFallbackOrg() throws Exception
-    {
-        expectTrackedEntityMetadataRequests();
-        fhirMockServer.stubFor( WireMock.get( urlPathEqualTo( getBaseFhirContext() + "/Patient/17" ) ).willReturn( aResponse()
-            .withHeader( "Content-Type", "application/fhir+json" )
-            .withBody( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/fhir/test/" + getResourceDir() + "/get-patient-17.json", StandardCharsets.UTF_8 ) ) ) );
-        fhirMockServer.stubFor( WireMock.get( urlPathEqualTo( getBaseFhirContext() + "/Organization/20" ) ).willReturn( aResponse()
-            .withHeader( "Content-Type", "application/fhir+json" )
-            .withBody( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/fhir/test/" + getResourceDir() + "/get-organization-20.json", StandardCharsets.UTF_8 ) ) ) );
-        systemDhis2Server.expect( ExpectedCount.once(), method( HttpMethod.GET ) ).andExpect( header( "Authorization", testConfiguration.getDhis2SystemAuthorization() ) )
-            .andExpect( requestTo( dhis2BaseUrl + "/api/" + dhis2ApiVersion + "/organisationUnits.json?paging=false&fields=lastUpdated,id,code,name,shortName,displayName,level,openingDate,closedDate,coordinates,leaf,parent%5Bid%5D&filter=code:eq:OU_1357" ) )
-            .andRespond( withSuccess( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/dhis/test/default-org-unit-OU_1357.json", StandardCharsets.UTF_8 ), MediaType.APPLICATION_JSON ) );
-
-        userDhis2Server.expect( ExpectedCount.once(), requestTo( dhis2BaseUrl + "/api/" + dhis2ApiVersion + "/trackedEntityInstances.json?trackedEntityType=MCPQUTHX1Ze&ouMode=ACCESSIBLE&filter=jD1NGmSntCt:EQ:PT_81587&pageSize=2&fields=" +
-            "deleted,trackedEntityInstance,trackedEntityType,orgUnit,coordinates,lastUpdated,attributes%5Battribute,value,lastUpdated,storedBy%5D" ) )
-            .andExpect( method( HttpMethod.GET ) ).andExpect( header( "Authorization", testConfiguration.getDhis2UserAuthorization() ) )
-            .andRespond( withSuccess( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/dhis/test/default-tei-17-get.json", StandardCharsets.UTF_8 ), MediaType.APPLICATION_JSON ) );
-        userDhis2Server.expect( ExpectedCount.once(), requestTo( dhis2BaseUrl + "/api/" + dhis2ApiVersion + "/trackedEntityInstances/JeR2xl4mZfz.json?mergeMode=MERGE" ) )
-            .andExpect( header( "Authorization", testConfiguration.getDhis2UserAuthorization() ) ).andExpect( method( HttpMethod.PUT ) )
-            .andExpect( content().contentTypeCompatibleWith( MediaType.APPLICATION_JSON ) )
-            .andExpect( content().json( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/dhis/test/default-tei-17-update.json", StandardCharsets.UTF_8 ) ) )
-            .andRespond( withSuccess( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/dhis/test/default-tei-17-update-response.json", StandardCharsets.UTF_8 ), MediaType.APPLICATION_JSON )
-                .headers( createDefaultHeaders() ) );
-        userDhis2Server.expect( ExpectedCount.never(), requestTo( dhis2BaseUrl + "/api/" + dhis2ApiVersion + "/trackedEntityInstances/JeR2xl4mZfz.json?fields=lastUpdated" ) )
-            .andExpect( method( HttpMethod.GET ) ).andExpect( header( "Authorization", testConfiguration.getDhis2UserAuthorization() ) )
-            .andRespond( withSuccess( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/dhis/test/default-tei-17-update-last-updated.json", StandardCharsets.UTF_8 ), MediaType.APPLICATION_JSON ) );
-
-        notifyResource( FhirResourceType.PATIENT,
-            IOUtils.resourceToString( "/org/dhis2/fhir/adapter/fhir/test/" + getResourceDir() + "/search-patient-17.json", StandardCharsets.UTF_8 ),
-            "17", IOUtils.resourceToString( "/org/dhis2/fhir/adapter/fhir/test/" + getResourceDir() + "/get-patient-17.json", StandardCharsets.UTF_8 ), true );
-
-        waitForEmptyResourceQueue();
-        userDhis2Server.verify();
-        systemDhis2Server.verify();
-    }
+//    @Test
+//    public void updatePersonWithFallbackOrg() throws Exception
+//    {
+//        expectTrackedEntityMetadataRequests();
+//        fhirMockServer.stubFor( WireMock.get( urlPathEqualTo( getBaseFhirContext() + "/Patient/17" ) ).willReturn( aResponse()
+//            .withHeader( "Content-Type", "application/fhir+json" )
+//            .withBody( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/fhir/test/" + getResourceDir() + "/get-patient-17.json", StandardCharsets.UTF_8 ) ) ) );
+//        fhirMockServer.stubFor( WireMock.get( urlPathEqualTo( getBaseFhirContext() + "/Organization/20" ) ).willReturn( aResponse()
+//            .withHeader( "Content-Type", "application/fhir+json" )
+//            .withBody( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/fhir/test/" + getResourceDir() + "/get-organization-20.json", StandardCharsets.UTF_8 ) ) ) );
+//        systemDhis2Server.expect( ExpectedCount.once(), method( HttpMethod.GET ) ).andExpect( header( "Authorization", testConfiguration.getDhis2SystemAuthorization() ) )
+//            .andExpect( requestTo( dhis2BaseUrl + "/api/" + dhis2ApiVersion + "/organisationUnits.json?paging=false&fields=lastUpdated,id,code,name,shortName,displayName,level,openingDate,closedDate,coordinates,leaf,parent%5Bid%5D&filter=code:eq:OU_1357" ) )
+//            .andRespond( withSuccess( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/dhis/test/default-org-unit-OU_1357.json", StandardCharsets.UTF_8 ), MediaType.APPLICATION_JSON ) );
+//
+//        userDhis2Server.expect( ExpectedCount.once(), requestTo( dhis2BaseUrl + "/api/" + dhis2ApiVersion + "/trackedEntityInstances.json?trackedEntityType=MCPQUTHX1Ze&ouMode=ACCESSIBLE&filter=jD1NGmSntCt:EQ:PT_81587&pageSize=2&fields=" +
+//            "deleted,trackedEntityInstance,trackedEntityType,orgUnit,coordinates,lastUpdated,attributes%5Battribute,value,lastUpdated,storedBy%5D" ) )
+//            .andExpect( method( HttpMethod.GET ) ).andExpect( header( "Authorization", testConfiguration.getDhis2UserAuthorization() ) )
+//            .andRespond( withSuccess( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/dhis/test/default-tei-17-get.json", StandardCharsets.UTF_8 ), MediaType.APPLICATION_JSON ) );
+//        userDhis2Server.expect( ExpectedCount.once(), requestTo( dhis2BaseUrl + "/api/" + dhis2ApiVersion + "/trackedEntityInstances/JeR2xl4mZfz.json?mergeMode=MERGE" ) )
+//            .andExpect( header( "Authorization", testConfiguration.getDhis2UserAuthorization() ) ).andExpect( method( HttpMethod.PUT ) )
+//            .andExpect( content().contentTypeCompatibleWith( MediaType.APPLICATION_JSON ) )
+//            .andExpect( content().json( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/dhis/test/default-tei-17-update.json", StandardCharsets.UTF_8 ) ) )
+//            .andRespond( withSuccess( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/dhis/test/default-tei-17-update-response.json", StandardCharsets.UTF_8 ), MediaType.APPLICATION_JSON )
+//                .headers( createDefaultHeaders() ) );
+//        userDhis2Server.expect( ExpectedCount.never(), requestTo( dhis2BaseUrl + "/api/" + dhis2ApiVersion + "/trackedEntityInstances/JeR2xl4mZfz.json?fields=lastUpdated" ) )
+//            .andExpect( method( HttpMethod.GET ) ).andExpect( header( "Authorization", testConfiguration.getDhis2UserAuthorization() ) )
+//            .andRespond( withSuccess( IOUtils.resourceToString( "/org/dhis2/fhir/adapter/dhis/test/default-tei-17-update-last-updated.json", StandardCharsets.UTF_8 ), MediaType.APPLICATION_JSON ) );
+//
+//        notifyResource( FhirResourceType.PATIENT,
+//            IOUtils.resourceToString( "/org/dhis2/fhir/adapter/fhir/test/" + getResourceDir() + "/search-patient-17.json", StandardCharsets.UTF_8 ),
+//            "17", IOUtils.resourceToString( "/org/dhis2/fhir/adapter/fhir/test/" + getResourceDir() + "/get-patient-17.json", StandardCharsets.UTF_8 ), true );
+//
+//        waitForEmptyResourceQueue();
+//        userDhis2Server.verify();
+//        systemDhis2Server.verify();
+//    }
 
     @Test
     public void updatePersonWithDefaultOrg() throws Exception

@@ -33,7 +33,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -182,7 +181,6 @@ public class DhisConfig
     public GenericJackson2JsonRedisSerializer cacheRedisSerializer()
     {
         final ObjectMapper mapper = new ObjectMapper();
-//        mapper.registerModule(new JavaTimeModule());
         mapper.enableDefaultTyping( ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY );
         mapper.setFilterProvider( new SimpleFilterProvider()
             .addFilter( AdapterBeanPropertyFilter.FILTER_NAME, new JsonCachePropertyFilter() )

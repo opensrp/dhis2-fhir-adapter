@@ -28,8 +28,6 @@ package org.dhis2.fhir.adapter.dhis.tracker.trackedentity.impl;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.apache.commons.lang.StringUtils;
 import org.dhis2.fhir.adapter.auth.UnauthorizedException;
@@ -69,14 +67,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.*;
-import org.springframework.http.client.support.BasicAuthorizationInterceptor;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
@@ -86,11 +82,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -142,14 +143,8 @@ public class TrackedEntityServiceImpl implements TrackedEntityService, LocalDhis
 
     private final LocalDhisResourceRepositoryTemplate<TrackedEntityInstance> resourceRepositoryTemplate;
 
-//    @Value( "${dhis2.fhir-adapter.endpoint.url}" )
-//    protected String dhis2BaseUrl;
-//
-//    @Value( "${dhis2.fhir-adapter.endpoint.api-version}" )
-//    protected String dhis2ApiVersion;
-
     @Autowired
-    public TrackedEntityServiceImpl( @Nonnull @Qualifier( "systemDhis2RestTemplate" ) RestTemplate restTemplate, @Nonnull RequestCacheService requestCacheService,
+    public TrackedEntityServiceImpl( @Nonnull @Qualifier( "userDhis2RestTemplate" ) RestTemplate restTemplate, @Nonnull RequestCacheService requestCacheService,
         @Nonnull TrackedEntityMetadataService metadataService, @Nonnull StoredDhisResourceService storedItemService )
     {
         this.restTemplate = restTemplate;
@@ -263,16 +258,8 @@ public class TrackedEntityServiceImpl implements TrackedEntityService, LocalDhis
             return Collections.emptyList();
         }
 
-        try {
-
-            return Objects.requireNonNull( restTemplate.getForEntity( FIND_BY_ATTR_VALUE_URI, TrackedEntityInstances.class, typeId, attributeId, value, maxResult )
-                    .getBody() ).getTrackedEntityInstances();
-        }
-        catch (org.springframework.web.client.HttpClientErrorException e) {
-
-           logger.error(e.getMessage(), e.getRawStatusCode());
-        }
-        return Collections.emptyList();
+        return Objects.requireNonNull( restTemplate.getForEntity( FIND_BY_ATTR_VALUE_URI, TrackedEntityInstances.class, typeId, attributeId, value, maxResult )
+            .getBody() ).getTrackedEntityInstances();
     }
 
     @HystrixCommand( ignoreExceptions = UnauthorizedException.class )
@@ -493,7 +480,7 @@ public class TrackedEntityServiceImpl implements TrackedEntityService, LocalDhis
         try
         {
             clear( trackedEntityInstance );
-            response = restTemplate.exchange( CREATE_URI, HttpMethod.POST, new HttpEntity<>(trackedEntityInstance), ImportSummariesWebMessage.class );
+            response = restTemplate.exchange( CREATE_URI, HttpMethod.POST, new HttpEntity<>( trackedEntityInstance ), ImportSummariesWebMessage.class );
         }
         catch ( HttpClientErrorException e )
         {
@@ -518,18 +505,6 @@ public class TrackedEntityServiceImpl implements TrackedEntityService, LocalDhis
 
         storeItem( syncGroup, trackedEntityInstance.getId(), response );
         return trackedEntityInstance;
-    }
-
-    private HttpHeaders createHeaders(String username, String password){
-        return new HttpHeaders() {{
-            String auth = username + ":" + password;
-            byte[] encodedAuth = org.apache.commons.codec.binary.Base64.encodeBase64(
-                    auth.getBytes(Charset.forName("US-ASCII")) );
-            String authHeader = "Basic " + new String( encodedAuth );
-            set( "Authorization", authHeader );
-            set( "Content-Type", "application/json" );
-            set( "Accept", "/" );
-        }};
     }
 
     @Nonnull
